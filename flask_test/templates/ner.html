@@ -1,0 +1,314 @@
+<?php
+$host = '168.192.0.124';
+$user = 'team2';
+$pw = '1234';
+$dbName = 'team2DB';
+$conn = mysqli_connect ($host, $user, $pw, $dbName);
+
+/*
+// DB 접속 확인하기
+if($conn){
+echo "MySQL 접속 성공";
+}else{
+echo "MySQL 접속 실패";
+}
+*/
+?>
+?>
+<!--$sql = "SELECT * FROM corpus WHERE id = 1";-->
+<!--$result = mysqli_query($conn, $sql);-->
+<!--$row = mysqli_fetch_array($result);-->
+<!--/*echo '<h2>'.$row['id'].'</h2>';-->
+<!--echo $row['content'];-->
+<!--*/-->
+<!--?>-->
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Instagram Analysis Service Demo</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>  
+    <script>
+      var host_url = '{{ host_url }}';
+    </script>
+    <style>
+      .col-md-h {
+        flex: 0 0 12.666667%; max-width: 12.666667%;
+      }
+      .col-md-d {
+        flex: 0 0 87.333333%; max-width: 87.333333%;
+      }
+      th {
+        width: 12%;
+        color: #fff;
+        background-color: #69748a;
+        border: 1px solid #36445e;
+        height: 40px;
+      }
+      td {
+        background-color: #fff;
+        border: 1px solid #ddd;
+      }
+      button.disabled:hover {
+        cursor: not-allowed;}
+        
+      body {
+            color: #555;
+            background: #eeeeee;
+            margin:0;
+            padding: 0;
+            box-sizing: border-box;}
+
+      h1 {
+            padding: 50px 0;
+            font-weight: 400;
+            text-align: center;}
+
+      p {
+            margin: 0 0 20px;
+            line-height: 1.5;}
+
+      .main {
+            min-width: 450px;
+            max-width: 1050px;
+            padding: 50px;
+            margin: 0 auto;
+            background: #ffffff;}
+
+      section {
+            display: none;
+            padding: 20px 0 0;
+            border-top: 1px solid #ddd;}
+
+      /*라디오버튼 숨김*/
+      input {
+              display: none;}
+
+      label {
+            display: inline-block;
+            margin: 0 0 -1px;
+            padding: 15px 25px;
+            font-weight: 600;
+            text-align: center;
+            color: #bbb;
+            border: 1px solid transparent;}
+
+      label:hover {
+            color: #2e9cdf;
+            cursor: pointer;}
+
+      /*input 클릭시, label 스타일*/
+      input:checked + label {
+              color: #555;
+              border: 1px solid #ddd;
+              border-top: 2px solid #2e9cdf;
+              border-bottom: 1px solid #ffffff;}
+
+      #tab1:checked ~ #content1,
+      #tab2:checked ~ #content2,
+      #tab3:checked ~ #content3,
+      #tab4:checked ~ #content4 {
+      display: block;}
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        var sock = io.connect(host_url);
+        sock.on('message', function(msg){
+          console.log(msg);
+          $('#ner_answer').text(msg);
+          $('#result-table').show();
+          window.scrollTo(0,document.body.scrollHeight);
+        });
+  
+        $('#sendbutton').on('click', function(){
+          var text = $('#myMessage_text').val().replace(/"/g,"'").substr(0, 5000);
+	  sock.send(JSON.stringify({"type":"ner","text":[escape(text)]}));
+        });
+      });
+
+    </script>
+    <main role="main">
+
+      <!-- Main jumbotron for a primary marketing message or call to action -->
+      <br> <br>
+      <div style="padding: 1rem 2rem 1rem;">
+        <div class="container">
+          <h1 class="display-3">
+	    <a href="/">Instagram Analysis Service</a>
+	  </h1>
+        </div>
+      </div>
+
+      <div class="container">
+
+      {% block content %}
+        <br>
+        <div class="row" style="font-size: 24px; font-weight: bold; margin-top: 30px; margin-bottom: 20px;">
+          개체명 인식 (NER)
+        </div>
+        <div class="row">
+          <button  class="col-md-h text-center" type="button" style="height: 50px; background-color: #36445e; border: #36445e solid 1px; color:#fff; margin-right: 5px;">
+            본문내용
+          </button>
+        </div>
+        <div class="row">
+        <div style="width:100%; background-color: #fafafa; border: #ddd solid 1px; padding: 10px;">
+	<textarea id="myMessage_text" rows="10" style="width: 100%;">
+	<?=$row['content']; ?>
+
+        {% for x in range(10) %}
+            {{ x }}
+        {% endfor%}
+	</textarea>
+	</div>
+    {% endblock %}
+	</div>
+	
+        <div id="result-table" class="row text-center" style="background-color: #fafafa; margin-top: 50px; padding: 10px; display: none">
+          <table style="width: 100%;">
+            <tbody>
+              <tr>
+                <th>결과</th>
+		<td><div style="white-space:pre-wrap;font-size:12pt;" id="ner_answer"></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="row text-center" style="width: 100%; margin-top: 40px; display: inline-block;">
+          <button type="button" id="sendbutton" style="background-color: #4270e0; color: #fff; width: 120px; border: 1px solid #4270e0; height: 40px;"> 인식 실행 </button>
+        </div>
+        
+        <div style="margin:50px;"></div>
+        <hr>
+        <div style="margin:50px;"></div>
+        <h1>NER 출구별 빈도수</h1>
+
+	<div class="main">
+	    <input id="tab1" type="radio" name="tabs" checked> <!--디폴트 메뉴-->
+	    <label for="tab1">tab menu1</label>
+
+	    <input id="tab2" type="radio" name="tabs">
+	    <label for="tab2">tab menu2</label>
+
+	    <input id="tab3" type="radio" name="tabs">
+	    <label for="tab3">tab menu3</label>
+
+	    <input id="tab4" type="radio" name="tabs">
+	    <label for="tab4">tab menu4</label>
+
+	    <section id="content1">
+	    	<p>tab menu1의 내용</p>
+	    	<!-- 차트 -->
+		<!-- chart js 라이브러리 -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.0/chart.min.js"></script>
+		<div>
+		    <canvas id="myChart"></canvas>
+		</div>
+
+		<script>
+		    // 우선 컨텍스트를 가져옵니다.
+		    var ctx = document.getElementById("myChart").getContext('2d');
+		    /*
+		    - Chart를 생성하면서,
+		    - ctx를 첫번째 argument로 넘겨주고,
+		    - 두번째 argument로 그림을 그릴때 필요한 요소들을 모두 넘겨줍니다.
+		    */
+		    var myChart = new Chart(ctx, {
+		        type: 'bar',
+		        data: {
+		            labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange", "black"],
+		            datasets: [{
+		                label: 'word frequency',
+		                data: [12, 19, 3, 5, 2, 3, 10],
+		                backgroundColor: [
+		                    'rgba(255, 99, 132, 0.2)',
+		                    'rgba(54, 162, 235, 0.2)',
+		                    'rgba(255, 206, 86, 0.2)',
+		                    'rgba(75, 192, 192, 0.2)',
+		                    'rgba(153, 102, 255, 0.2)',
+		                    'rgba(255, 159, 64, 0.2)',
+		                    'rgba(0, 0, 0, 0.2)'
+		                ],
+		                borderColor: [
+		                    'rgba(255,99,132,1)',
+		                    'rgba(54, 162, 235, 1)',
+		                    'rgba(255, 206, 86, 1)',
+		                    'rgba(75, 192, 192, 1)',
+		                    'rgba(153, 102, 255, 1)',
+		                    'rgba(255, 159, 64, 1)',
+		                    'rgba(0, 0, 0, 1)'
+		                ],
+		                borderWidth: 1
+		            }]
+		        },
+		        options: {
+		            maintainAspectRatio: true, // default value. false일 경우 포함된 div의 크기에 맞춰서 그려짐.
+		            
+		            plugins: {
+		                title: {
+		                    display: true,
+		                    text: 'word frequency',
+		                    align: 'center',
+		                    magin: 20,
+		                    font: {
+		                      size: 25
+		                    }
+		                },
+		                legend: false
+		            },
+		            scales: {
+		                yAxes: [{
+		                    ticks: {
+		                        beginAtZero:true
+		                    }
+		                }]
+		            }
+		        }
+		    });
+		</script>
+		
+	    </section>
+
+	    <section id="content2">
+		<p>tab menu2의 내용</p>
+	    </section>
+
+	    <section id="content3">
+		<p>tab menu3의 내용</p>
+	    </section>
+
+	    <section id="content4">
+		<p>tab menu4의 내용</p>
+	    </section>
+
+        <hr>
+
+      </div> <!-- /container -->
+
+    </main>
+
+    <footer class="container">
+	    <p>&copy;HDMD Ai. All rights reserved.</p>
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>
+
